@@ -2,3 +2,9 @@
 build-Qt_CS_Chat_Systm-Desktop-*/
 *.o
 *.exe
+build-Qt_CS_Chat_Systm-Desktop-*/
+*.out
+*.app
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
