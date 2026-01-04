@@ -8,14 +8,11 @@ QT -= gui
 CONFIG += c++17 console
 CONFIG -= app_bundle
 
-# Include warnings for deprecated Qt features
-DEFINES += QT_DEPRECATED_WARNINGS
-
 # Include paths
-INCLUDEPATH += $$PWD/Client
-INCLUDEPATH += $$PWD/Server
+INCLUDEPATH += \
+    $$PWD/Client \
+    $$PWD/Server \
+    $$PWD/Server/Core \
+    $$PWD/Server/Commands \
+    $$PWD/Server/Services
 
-# Optional: directories for build outputs (if you want)
-# DESTDIR = $$PWD/bin
-# OBJECTS_DIR = $$PWD/build/obj
-# MOC_DIR = $$PWD/build/moc

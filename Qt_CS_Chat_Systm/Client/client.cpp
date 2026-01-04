@@ -18,17 +18,24 @@ void Client::connectToServer(const QString& host, quint16 port)
 void Client::connected()
 {
     qDebug() << "------Connected to server------";
-    // Send a test message
-    socket->write("Hello Server - From the client \n");
 }
 
 void Client::readyRead()
 {
-    QByteArray data = socket->readAll();
-    qDebug() << "Received from server:" << data;
+    while (socket->canReadLine()) {
+        QByteArray line = socket->readLine();
+        qDebug() << line.trimmed();
+    }
 }
 
 void Client::disconnected()
 {
     qDebug() << "------Disconnected from server------";
+}
+
+void Client::sendLine(const QString& line)
+{
+    if (socket->state() == QAbstractSocket::ConnectedState) {
+        socket->write((line + "\n").toUtf8());
+    }
 }

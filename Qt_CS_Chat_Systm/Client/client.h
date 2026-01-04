@@ -15,8 +15,11 @@ private slots:
     void connected();
     void readyRead();
     void disconnected();
+public slots:
+    void sendLine(const QString& line); // send input to server
 
 private:
     QTcpSocket* socket;
 };
+
 #endif // CLIENT_H

@@ -18,16 +18,25 @@ void ClientSession::start()
         emit finished();
         return;
     }
-
     connect(socket, &QTcpSocket::readyRead, this, &ClientSession::readData);
     connect(socket, &QTcpSocket::disconnected, this, &ClientSession::finished);
-
     qDebug() << "Client session started in thread:" << QThread::currentThread();
 }
 
 void ClientSession::readData()
 {
-    QByteArray data = socket->readAll();
-    qDebug() << "Received from client:" << data;
-    socket->write("Server received: " + data); //ACK
+    buffer.append(socket->readAll());
+
+    while (true) {
+        int newlineIndex = buffer.indexOf('\n');
+        if (newlineIndex == -1) {
+            break;
+        }
+        QByteArray line = buffer.left(newlineIndex);
+        buffer.remove(0, newlineIndex + 1);
+        QString commandLine = QString::fromUtf8(line).trimmed();
+        QString response = dispatcher.dispatch(commandLine, context);
+        qDebug() << "Command received:" << commandLine;
+        socket->write(response.toUtf8());
+    }
 }

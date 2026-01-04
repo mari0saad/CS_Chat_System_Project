@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include "commanddispatcher.h"
+#include "clientcontext.h"
 
 class ClientSession : public QObject
 {
@@ -19,8 +21,12 @@ private slots:
     void readData();
 
 private:
-    QTcpSocket* socket;
+    QTcpSocket* socket = nullptr;
     qintptr socketDescriptor;
+    ClientContext context;
+    CommandDispatcher dispatcher;
+    QByteArray buffer;
+
 };
 
 
