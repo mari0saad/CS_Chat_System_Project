@@ -1,0 +1,4 @@
+# Ignore Qt build directories
+build-Qt_CS_Chat_Systm-Desktop-*/
+*.o
+*.exe
