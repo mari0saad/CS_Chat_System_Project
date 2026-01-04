@@ -22,16 +22,16 @@ QString AuthCommand::execute(ClientContext &context)
     case AuthService::Result::Success:
         context.authenticated = true;
         context.username = username;
-        errorCode = "OK Authenticated\n";
+        errorCode = "OK 'Authenticated'\n";
         break;
     case AuthService::Result::InvalidUsername:
-        errorCode = "ERROR 101\n";
+        errorCode = "ERROR 101 'Invalid Username'\n";
         break;
     case AuthService::Result::InvalidPassword:
-        errorCode = "ERROR 102\n";
+        errorCode = "ERROR 102 'Invalid Password'\n";
         break;
     default:
-        errorCode = "ERROR 500\n"; // internal error
+        errorCode = "ERROR 500 'Internal Error'\n";
     }
     return errorCode;
 }
