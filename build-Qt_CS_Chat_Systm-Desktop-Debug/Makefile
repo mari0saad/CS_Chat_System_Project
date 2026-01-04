@@ -14,10 +14,10 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_NETWORK_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_QML_DEBUG -DQT_NETWORK_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -fPIC -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++1z -Wall -Wextra -fPIC -D_REENTRANT $(DEFINES)
-INCPATH       = -I../Qt_CS_Chat_Systm -I. -I../Qt_CS_Chat_Systm/Client -I../Qt_CS_Chat_Systm/Server -I../../../Qt6/include -I../../../Qt6/include/QtNetwork -I../../../Qt6/include/QtCore -I. -I../../../Qt6/mkspecs/linux-g++
+INCPATH       = -I../Qt_CS_Chat_Systm -I. -I../Qt_CS_Chat_Systm/Client -I../Qt_CS_Chat_Systm/Server -I../Qt_CS_Chat_Systm/Server/Core -I../Qt_CS_Chat_Systm/Server/Commands -I../Qt_CS_Chat_Systm/Server/Services -I../../../Qt6/include -I../../../Qt6/include/QtNetwork -I../../../Qt6/include/QtCore -I. -I../../../Qt6/mkspecs/linux-g++
 QMAKE         = /home/ms/Qt6/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -53,12 +53,18 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../Qt_CS_Chat_Systm/Client/client.cpp \
+		../Qt_CS_Chat_Systm/Server/Commands/authcommand.cpp \
+		../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.cpp \
+		../Qt_CS_Chat_Systm/Server/Services/authservice.cpp \
 		../Qt_CS_Chat_Systm/Server/clientsession.cpp \
 		../Qt_CS_Chat_Systm/Server/server.cpp \
 		../Qt_CS_Chat_Systm/main.cpp moc_client.cpp \
 		moc_clientsession.cpp \
 		moc_server.cpp
 OBJECTS       = client.o \
+		authcommand.o \
+		commanddispatcher.o \
+		authservice.o \
 		clientsession.o \
 		server.o \
 		main.o \
@@ -310,8 +316,16 @@ DIST          = ../../../Qt6/mkspecs/features/spec_pre.prf \
 		../../../Qt6/mkspecs/features/yacc.prf \
 		../../../Qt6/mkspecs/features/lex.prf \
 		../Qt_CS_Chat_Systm/Qt_CS_Chat_Systm.pro ../Qt_CS_Chat_Systm/Client/client.h \
+		../Qt_CS_Chat_Systm/Server/Commands/authcommand.h \
+		../Qt_CS_Chat_Systm/Server/Core/clientcontext.h \
+		../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.h \
+		../Qt_CS_Chat_Systm/Server/Core/iservercommand.h \
+		../Qt_CS_Chat_Systm/Server/Services/authservice.h \
 		../Qt_CS_Chat_Systm/Server/clientsession.h \
 		../Qt_CS_Chat_Systm/Server/server.h ../Qt_CS_Chat_Systm/Client/client.cpp \
+		../Qt_CS_Chat_Systm/Server/Commands/authcommand.cpp \
+		../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.cpp \
+		../Qt_CS_Chat_Systm/Server/Services/authservice.cpp \
 		../Qt_CS_Chat_Systm/Server/clientsession.cpp \
 		../Qt_CS_Chat_Systm/Server/server.cpp \
 		../Qt_CS_Chat_Systm/main.cpp
@@ -836,8 +850,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../Qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../Qt_CS_Chat_Systm/Client/client.h ../Qt_CS_Chat_Systm/Server/clientsession.h ../Qt_CS_Chat_Systm/Server/server.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../Qt_CS_Chat_Systm/Client/client.cpp ../Qt_CS_Chat_Systm/Server/clientsession.cpp ../Qt_CS_Chat_Systm/Server/server.cpp ../Qt_CS_Chat_Systm/main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../Qt_CS_Chat_Systm/Client/client.h ../Qt_CS_Chat_Systm/Server/Commands/authcommand.h ../Qt_CS_Chat_Systm/Server/Core/clientcontext.h ../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.h ../Qt_CS_Chat_Systm/Server/Core/iservercommand.h ../Qt_CS_Chat_Systm/Server/Services/authservice.h ../Qt_CS_Chat_Systm/Server/clientsession.h ../Qt_CS_Chat_Systm/Server/server.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../Qt_CS_Chat_Systm/Client/client.cpp ../Qt_CS_Chat_Systm/Server/Commands/authcommand.cpp ../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.cpp ../Qt_CS_Chat_Systm/Server/Services/authservice.cpp ../Qt_CS_Chat_Systm/Server/clientsession.cpp ../Qt_CS_Chat_Systm/Server/server.cpp ../Qt_CS_Chat_Systm/main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -988,7 +1002,7 @@ moc_client.cpp: ../Qt_CS_Chat_Systm/Client/client.h \
 		../../../Qt6/include/QtCore/qvariant.h \
 		moc_predefs.h \
 		../../../Qt6/libexec/moc
-	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/build-Qt_CS_Chat_Systm-Desktop-Debug/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Qt_CS_Chat_Systm/Client/client.h -o moc_client.cpp
+	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/build-Qt_CS_Chat_Systm-Desktop-Debug/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Core -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Commands -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Services -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Qt_CS_Chat_Systm/Client/client.h -o moc_client.cpp
 
 moc_clientsession.cpp: ../Qt_CS_Chat_Systm/Server/clientsession.h \
 		../../../Qt6/include/QtCore/QObject \
@@ -1104,9 +1118,12 @@ moc_clientsession.cpp: ../Qt_CS_Chat_Systm/Server/clientsession.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
 		../../../Qt6/include/QtCore/q20memory.h \
 		../../../Qt6/include/QtCore/qvariant.h \
+		../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.h \
+		../../../Qt6/include/QtCore/QString \
+		../Qt_CS_Chat_Systm/Server/Core/clientcontext.h \
 		moc_predefs.h \
 		../../../Qt6/libexec/moc
-	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/build-Qt_CS_Chat_Systm-Desktop-Debug/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Qt_CS_Chat_Systm/Server/clientsession.h -o moc_clientsession.cpp
+	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/build-Qt_CS_Chat_Systm-Desktop-Debug/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Core -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Commands -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Services -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Qt_CS_Chat_Systm/Server/clientsession.h -o moc_clientsession.cpp
 
 moc_server.cpp: ../Qt_CS_Chat_Systm/Server/server.h \
 		../../../Qt6/include/QtCore/QObject \
@@ -1223,7 +1240,7 @@ moc_server.cpp: ../Qt_CS_Chat_Systm/Server/server.h \
 		../../../Qt6/include/QtCore/q20memory.h \
 		moc_predefs.h \
 		../../../Qt6/libexec/moc
-	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/build-Qt_CS_Chat_Systm-Desktop-Debug/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Qt_CS_Chat_Systm/Server/server.h -o moc_server.cpp
+	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/build-Qt_CS_Chat_Systm-Desktop-Debug/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Core -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Commands -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Services -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../Qt_CS_Chat_Systm/Server/server.h -o moc_server.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1356,6 +1373,228 @@ client.o: ../Qt_CS_Chat_Systm/Client/client.cpp ../Qt_CS_Chat_Systm/Client/clien
 		../../../Qt6/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o client.o ../Qt_CS_Chat_Systm/Client/client.cpp
 
+authcommand.o: ../Qt_CS_Chat_Systm/Server/Commands/authcommand.cpp ../Qt_CS_Chat_Systm/Server/Commands/authcommand.h \
+		../Qt_CS_Chat_Systm/Server/Services/authservice.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		../Qt_CS_Chat_Systm/Server/Core/iservercommand.h \
+		../Qt_CS_Chat_Systm/Server/Core/clientcontext.h \
+		../../../Qt6/include/QtCore/QStringList \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o authcommand.o ../Qt_CS_Chat_Systm/Server/Commands/authcommand.cpp
+
+commanddispatcher.o: ../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.cpp ../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		../Qt_CS_Chat_Systm/Server/Core/iservercommand.h \
+		../Qt_CS_Chat_Systm/Server/Commands/authcommand.h \
+		../Qt_CS_Chat_Systm/Server/Services/authservice.h \
+		../Qt_CS_Chat_Systm/Server/Core/clientcontext.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commanddispatcher.o ../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.cpp
+
+authservice.o: ../Qt_CS_Chat_Systm/Server/Services/authservice.cpp ../Qt_CS_Chat_Systm/Server/Services/authservice.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o authservice.o ../Qt_CS_Chat_Systm/Server/Services/authservice.cpp
+
 clientsession.o: ../Qt_CS_Chat_Systm/Server/clientsession.cpp ../Qt_CS_Chat_Systm/Server/clientsession.h \
 		../../../Qt6/include/QtCore/QObject \
 		../../../Qt6/include/QtCore/qobject.h \
@@ -1470,6 +1709,9 @@ clientsession.o: ../Qt_CS_Chat_Systm/Server/clientsession.cpp ../Qt_CS_Chat_Syst
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
 		../../../Qt6/include/QtCore/q20memory.h \
 		../../../Qt6/include/QtCore/qvariant.h \
+		../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.h \
+		../../../Qt6/include/QtCore/QString \
+		../Qt_CS_Chat_Systm/Server/Core/clientcontext.h \
 		../../../Qt6/include/QtCore/QDebug \
 		../../../Qt6/include/QtCore/QThread \
 		../../../Qt6/include/QtCore/qthread.h \
@@ -1590,11 +1832,14 @@ server.o: ../Qt_CS_Chat_Systm/Server/server.cpp ../Qt_CS_Chat_Systm/Server/serve
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
 		../../../Qt6/include/QtCore/q20memory.h \
+		../../../Qt6/include/QtCore/QDebug \
 		../Qt_CS_Chat_Systm/Server/clientsession.h \
 		../../../Qt6/include/QtNetwork/QTcpSocket \
 		../../../Qt6/include/QtNetwork/qtcpsocket.h \
 		../../../Qt6/include/QtCore/qvariant.h \
-		../../../Qt6/include/QtCore/QDebug \
+		../Qt_CS_Chat_Systm/Server/Core/commanddispatcher.h \
+		../../../Qt6/include/QtCore/QString \
+		../Qt_CS_Chat_Systm/Server/Core/clientcontext.h \
 		../../../Qt6/include/QtCore/QThread \
 		../../../Qt6/include/QtCore/qthread.h \
 		../../../Qt6/include/QtCore/qdeadlinetimer.h \
