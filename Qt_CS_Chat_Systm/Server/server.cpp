@@ -2,6 +2,7 @@
 #include <QDebug>
 #include "clientsession.h"
 #include <QThread>
+#include "serverconfig.h"
 
 Server::Server(QObject *parent) : QTcpServer(parent)
 {
@@ -9,6 +10,7 @@ Server::Server(QObject *parent) : QTcpServer(parent)
 
 void Server::start(quint16 port)
 {
+    ServerConfig::ensureSandboxExists();
     if (listen(QHostAddress::Any, port)) {
         qDebug() << "Server listening on port" << port;
     } else {

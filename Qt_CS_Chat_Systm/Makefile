@@ -53,8 +53,15 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = Client/client.cpp \
+		Server/Commands/appendcommand.cpp \
 		Server/Commands/authcommand.cpp \
 		Server/Commands/createcommand.cpp \
+		Server/Commands/deletecommand.cpp \
+		Server/Commands/infocommand.cpp \
+		Server/Commands/listcommand.cpp \
+		Server/Commands/readcommand.cpp \
+		Server/Commands/renamecommand.cpp \
+		Server/Commands/writecommand.cpp \
 		Server/Core/commanddispatcher.cpp \
 		Server/Services/authservice.cpp \
 		Server/Services/fileservice.cpp \
@@ -64,8 +71,15 @@ SOURCES       = Client/client.cpp \
 		moc_clientsession.cpp \
 		moc_server.cpp
 OBJECTS       = client.o \
+		appendcommand.o \
 		authcommand.o \
 		createcommand.o \
+		deletecommand.o \
+		infocommand.o \
+		listcommand.o \
+		readcommand.o \
+		renamecommand.o \
+		writecommand.o \
 		commanddispatcher.o \
 		authservice.o \
 		fileservice.o \
@@ -319,17 +333,32 @@ DIST          = ../../../Qt6/mkspecs/features/spec_pre.prf \
 		../../../Qt6/mkspecs/features/yacc.prf \
 		../../../Qt6/mkspecs/features/lex.prf \
 		Qt_CS_Chat_Systm.pro Client/client.h \
+		Server/Commands/appendcommand.h \
 		Server/Commands/authcommand.h \
 		Server/Commands/createcommand.h \
+		Server/Commands/deletecommand.h \
+		Server/Commands/infocommand.h \
+		Server/Commands/listcommand.h \
+		Server/Commands/readcommand.h \
+		Server/Commands/renamecommand.h \
+		Server/Commands/writecommand.h \
 		Server/Core/clientcontext.h \
 		Server/Core/commanddispatcher.h \
 		Server/Core/iservercommand.h \
+		Server/Core/serverconfig.h \
 		Server/Services/authservice.h \
 		Server/Services/fileservice.h \
 		Server/clientsession.h \
 		Server/server.h Client/client.cpp \
+		Server/Commands/appendcommand.cpp \
 		Server/Commands/authcommand.cpp \
 		Server/Commands/createcommand.cpp \
+		Server/Commands/deletecommand.cpp \
+		Server/Commands/infocommand.cpp \
+		Server/Commands/listcommand.cpp \
+		Server/Commands/readcommand.cpp \
+		Server/Commands/renamecommand.cpp \
+		Server/Commands/writecommand.cpp \
 		Server/Core/commanddispatcher.cpp \
 		Server/Services/authservice.cpp \
 		Server/Services/fileservice.cpp \
@@ -855,8 +884,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../Qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Client/client.h Server/Commands/authcommand.h Server/Commands/createcommand.h Server/Core/clientcontext.h Server/Core/commanddispatcher.h Server/Core/iservercommand.h Server/Services/authservice.h Server/Services/fileservice.h Server/clientsession.h Server/server.h $(DISTDIR)/
-	$(COPY_FILE) --parents Client/client.cpp Server/Commands/authcommand.cpp Server/Commands/createcommand.cpp Server/Core/commanddispatcher.cpp Server/Services/authservice.cpp Server/Services/fileservice.cpp Server/clientsession.cpp Server/server.cpp main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Client/client.h Server/Commands/appendcommand.h Server/Commands/authcommand.h Server/Commands/createcommand.h Server/Commands/deletecommand.h Server/Commands/infocommand.h Server/Commands/listcommand.h Server/Commands/readcommand.h Server/Commands/renamecommand.h Server/Commands/writecommand.h Server/Core/clientcontext.h Server/Core/commanddispatcher.h Server/Core/iservercommand.h Server/Core/serverconfig.h Server/Services/authservice.h Server/Services/fileservice.h Server/clientsession.h Server/server.h $(DISTDIR)/
+	$(COPY_FILE) --parents Client/client.cpp Server/Commands/appendcommand.cpp Server/Commands/authcommand.cpp Server/Commands/createcommand.cpp Server/Commands/deletecommand.cpp Server/Commands/infocommand.cpp Server/Commands/listcommand.cpp Server/Commands/readcommand.cpp Server/Commands/renamecommand.cpp Server/Commands/writecommand.cpp Server/Core/commanddispatcher.cpp Server/Services/authservice.cpp Server/Services/fileservice.cpp Server/clientsession.cpp Server/server.cpp main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1378,6 +1407,124 @@ client.o: Client/client.cpp Client/client.h \
 		../../../Qt6/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o client.o Client/client.cpp
 
+appendcommand.o: Server/Commands/appendcommand.cpp Server/Commands/appendcommand.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Core/iservercommand.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o appendcommand.o Server/Commands/appendcommand.cpp
+
 authcommand.o: Server/Commands/authcommand.cpp Server/Commands/authcommand.h \
 		Server/Services/authservice.h \
 		../../../Qt6/include/QtCore/QString \
@@ -1526,8 +1673,764 @@ createcommand.o: Server/Commands/createcommand.cpp Server/Commands/createcommand
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
-		Server/Services/fileservice.h
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o createcommand.o Server/Commands/createcommand.cpp
+
+deletecommand.o: Server/Commands/deletecommand.cpp Server/Commands/deletecommand.h \
+		Server/Core/iservercommand.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o deletecommand.o Server/Commands/deletecommand.cpp
+
+infocommand.o: Server/Commands/infocommand.cpp Server/Commands/infocommand.h \
+		Server/Core/iservercommand.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o infocommand.o Server/Commands/infocommand.cpp
+
+listcommand.o: Server/Commands/listcommand.cpp Server/Commands/listcommand.h \
+		Server/Core/iservercommand.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o listcommand.o Server/Commands/listcommand.cpp
+
+readcommand.o: Server/Commands/readcommand.cpp Server/Commands/readcommand.h \
+		Server/Core/iservercommand.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o readcommand.o Server/Commands/readcommand.cpp
+
+renamecommand.o: Server/Commands/renamecommand.cpp Server/Commands/renamecommand.h \
+		Server/Core/iservercommand.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o renamecommand.o Server/Commands/renamecommand.cpp
+
+writecommand.o: Server/Commands/writecommand.cpp Server/Commands/writecommand.h \
+		Server/Core/iservercommand.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Core/clientcontext.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o writecommand.o Server/Commands/writecommand.cpp
 
 commanddispatcher.o: Server/Core/commanddispatcher.cpp Server/Core/commanddispatcher.h \
 		../../../Qt6/include/QtCore/QString \
@@ -1601,7 +2504,61 @@ commanddispatcher.o: Server/Core/commanddispatcher.cpp Server/Core/commanddispat
 		Server/Services/authservice.h \
 		Server/Core/clientcontext.h \
 		Server/Commands/createcommand.h \
-		Server/Services/fileservice.h
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Commands/writecommand.h \
+		Server/Commands/appendcommand.h \
+		Server/Commands/readcommand.h \
+		Server/Commands/renamecommand.h \
+		Server/Commands/listcommand.h \
+		Server/Commands/deletecommand.h \
+		Server/Commands/infocommand.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commanddispatcher.o Server/Core/commanddispatcher.cpp
 
 authservice.o: Server/Services/authservice.cpp Server/Services/authservice.h \
@@ -1740,7 +2697,8 @@ fileservice.o: Server/Services/fileservice.cpp Server/Services/fileservice.h \
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
-		../../../Qt6/include/QtCore/QFile \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
 		../../../Qt6/include/QtCore/qfile.h \
 		../../../Qt6/include/QtCore/qfiledevice.h \
 		../../../Qt6/include/QtCore/qiodevice.h \
@@ -1768,7 +2726,29 @@ fileservice.o: Server/Services/fileservice.cpp Server/Services/fileservice.h \
 		../../../Qt6/include/QtCore/qtaggedpointer.h \
 		../../../Qt6/include/QtCore/qscopeguard.h \
 		../../../Qt6/include/QtCore/qobject_impl.h \
-		../../../Qt6/include/QtCore/qbindingstorage.h
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h \
+		../../../Qt6/include/QtCore/QFile \
+		../../../Qt6/include/QtCore/QDir \
+		../../../Qt6/include/QtCore/qdir.h \
+		../../../Qt6/include/QtCore/QDateTime \
+		Server/Core/serverconfig.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileservice.o Server/Services/fileservice.cpp
 
 clientsession.o: Server/clientsession.cpp Server/clientsession.h \
@@ -2019,7 +2999,16 @@ server.o: Server/server.cpp Server/server.h \
 		../../../Qt6/include/QtCore/QThread \
 		../../../Qt6/include/QtCore/qthread.h \
 		../../../Qt6/include/QtCore/qdeadlinetimer.h \
-		../../../Qt6/include/QtCore/qelapsedtimer.h
+		../../../Qt6/include/QtCore/qelapsedtimer.h \
+		Server/Core/serverconfig.h \
+		../../../Qt6/include/QtCore/QDir \
+		../../../Qt6/include/QtCore/qdir.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o server.o Server/server.cpp
 
 main.o: main.cpp ../../../Qt6/include/QtCore/QCoreApplication \
