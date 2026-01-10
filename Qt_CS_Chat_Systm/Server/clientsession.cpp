@@ -4,39 +4,61 @@
 #include <QThread>
 
 
-ClientSession::ClientSession(qintptr descriptor, QObject* parent)
-    : QObject(parent), socketDescriptor(descriptor)
-{
-}
+ClientSession::ClientSession(qintptr socketDescriptor, CommandRegistry* registry, QObject* parent)
+    : QObject(parent),m_registry(registry)
+    {
+        // Create socket
+        m_socket = new QTcpSocket(this);
+        m_socket->setSocketDescriptor(socketDescriptor);
+        m_context.fileService = new FileService();
+        m_context.authService = new AuthService();
+        m_context.isAuthenticated = false;
+
+        connect(m_socket, &QTcpSocket::readyRead, this, &ClientSession::onReadyRead);
+        connect(m_socket, &QTcpSocket::disconnected, this, &ClientSession::onDisconnected);
+    }
+
 
 void ClientSession::start()
 {
-    socket = new QTcpSocket(this);
-
-    if (!socket->setSocketDescriptor(socketDescriptor)) {
-        qDebug() << "Failed to set socket descriptor";
-        emit finished();
-        return;
-    }
-    connect(socket, &QTcpSocket::readyRead, this, &ClientSession::readData);
-    connect(socket, &QTcpSocket::disconnected, this, &ClientSession::finished);
     qDebug() << "Client session started in thread:" << QThread::currentThread();
 }
 
-void ClientSession::readData()
+void ClientSession::onReadyRead()
 {
-    buffer.append(socket->readAll());
+    while (m_socket->canReadLine()) {
 
-    while (true) {
-        int newlineIndex = buffer.indexOf('\n');
-        if (newlineIndex == -1) {
-            break;
+        QString line = m_socket->readLine().trimmed();
+        if (line.isEmpty())
+            continue;
+
+        ParsedCommand cmd;
+
+        if (line.startsWith("{")) {
+            cmd = m_jsonParser.parse(line);
+        } else {
+            cmd = m_textParser.parse(line);
         }
-        QByteArray line = buffer.left(newlineIndex);
-        buffer.remove(0, newlineIndex + 1);
-        QString commandLine = QString::fromUtf8(line).trimmed();
-        QString response = dispatcher.dispatch(commandLine, context);
-        qDebug() << "Command received:" << commandLine;
-        socket->write(response.toUtf8());
+
+        QString response;
+
+        auto command = m_registry->createCommand(cmd);
+        if (!command) {
+            response = "ERROR 400 Unknown command";
+        } else {
+            response = command->execute(&m_context, cmd);
+        }
+
+        m_socket->write(response.toUtf8() + "\n");
     }
 }
+
+
+void ClientSession::onDisconnected()
+{
+    qDebug() << "Client disconnected";
+    m_socket->deleteLater();
+    deleteLater();
+}
+
+

@@ -14,5 +14,6 @@ INCLUDEPATH += \
     $$PWD/Server \
     $$PWD/Server/Core \
     $$PWD/Server/Commands \
-    $$PWD/Server/Services
+    $$PWD/Server/Services \
+    $$PWD/Server/Parsers
 

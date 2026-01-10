@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpServer>
+#include "commandregistry.h"
 
 class ClientSession;
 
@@ -15,6 +16,9 @@ public:
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
+
+private:
+    CommandRegistry m_registry;
 };
 
 

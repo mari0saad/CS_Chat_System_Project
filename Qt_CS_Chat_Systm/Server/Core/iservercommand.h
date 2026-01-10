@@ -2,14 +2,14 @@
 #define ISERVERCOMMAND_H
 
 #include <QString>
-
-struct ClientContext;
+#include "clientcontext.h"
+#include "parsedcommand.h"
 
 class IServerCommand
 {
 public:
     virtual ~IServerCommand() = default;
-    virtual QString execute(ClientContext& context) = 0;
+    virtual QString execute(ClientContext* context, const ParsedCommand& cmd) = 0;
 };
 
 #endif // ISERVERCOMMAND_H

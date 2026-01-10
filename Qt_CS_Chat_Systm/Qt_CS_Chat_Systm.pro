@@ -18,7 +18,8 @@ SOURCES += \
     Server/Commands/readcommand.cpp \
     Server/Commands/renamecommand.cpp \
     Server/Commands/writecommand.cpp \
-    Server/Core/commanddispatcher.cpp \
+    Server/Parsers/jsoncommandparser.cpp \
+    Server/Parsers/textcommandparser.cpp \
     Server/Services/authservice.cpp \
     Server/Services/fileservice.cpp \
     Server/clientsession.cpp \
@@ -30,17 +31,21 @@ HEADERS += \
     Client/client.h \
     Server/Commands/appendcommand.h \
     Server/Commands/authcommand.h \
+    Server/Commands/commandregistry.h \
     Server/Commands/createcommand.h \
     Server/Commands/deletecommand.h \
     Server/Commands/infocommand.h \
     Server/Commands/listcommand.h \
+    Server/Commands/parsedcommand.h \
     Server/Commands/readcommand.h \
     Server/Commands/renamecommand.h \
     Server/Commands/writecommand.h \
     Server/Core/clientcontext.h \
-    Server/Core/commanddispatcher.h \
     Server/Core/iservercommand.h \
     Server/Core/serverconfig.h \
+    Server/Parsers/icommandparser.h \
+    Server/Parsers/jsoncommandparser.h \
+    Server/Parsers/textcommandparser.h \
     Server/Services/authservice.h \
     Server/Services/fileservice.h \
     Server/clientsession.h \

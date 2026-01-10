@@ -1,22 +1,15 @@
 #include "appendcommand.h"
 
+#define REQUIRE_AUTH(ctx) \
+    if (!(ctx)->isAuthenticated) return "ERROR 401 Unauthorized";
 
 
-AppendCommand::AppendCommand(const QString &rawLine)
+QString AppendCommand::execute(ClientContext *context, const ParsedCommand &cmd)
 {
-    int delimeter = rawLine.indexOf(';');
-    if(delimeter != -1)
-    {
-        filename = rawLine.mid(QString("APPEND ").length(), delimeter - QString("APPEND ").length()).trimmed();
-        data = rawLine.mid(delimeter +1 );
-    }
-}
+    REQUIRE_AUTH(context);
 
-QString AppendCommand::execute(ClientContext &context)
-{
-    QString errorMessage;
-    if (!fileService.appendFile(filename, data, errorMessage)) {
-        return "ERROR 500 " + errorMessage + "\n";
-    }
-    return "OK data appended successfully\n";
+    if (cmd.args.size() != 1)
+        return "ERROR 400 Missing filename";
+
+    return context->fileService->appendFileCmd(cmd.args[0], cmd.data);
 }

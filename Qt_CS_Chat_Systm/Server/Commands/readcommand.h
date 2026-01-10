@@ -7,12 +7,7 @@
 class ReadCommand : public IServerCommand
 {
 public:
-    explicit ReadCommand(const QString& rawLine);
-    QString execute(ClientContext& context) override;
-
-private:
-    QString filename;
-    FileService fileService;
+    QString execute(ClientContext* context, const ParsedCommand& cmd) override;
 };
 
 #endif // READCOMMAND_H

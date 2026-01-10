@@ -1,16 +1,12 @@
 #include "listcommand.h"
 
+#define REQUIRE_AUTH(ctx) \
+    if (!(ctx)->isAuthenticated) return "ERROR 401 Unauthorized";
 
-QString ListCommand::execute(ClientContext &)
+
+QString ListCommand::execute(ClientContext *context, const ParsedCommand &cmd)
 {
-    QStringList files;
-    QString errorMessage;
-    if (!fileService.listFiles(files, errorMessage)) {
-        return "ERROR 500 " + errorMessage + "\n";
-    }
-    QString response = "OK " + QString::number(files.size()) + "\n";
-    for (const QString& f : files) {
-        response += f + "\n";
-    }
-    return response;
+    REQUIRE_AUTH(context);
+
+    return context->fileService->listFilesCmd();
 }

@@ -1,37 +1,30 @@
 #include "authcommand.h"
-#include "clientcontext.h"
 #include <QString>
-#include <QStringList>
 
-AuthCommand::AuthCommand(const QString &rawLine)
+
+QString AuthCommand::execute(ClientContext *context, const ParsedCommand &cmd)
 {
-    const QString args = rawLine.mid(QString("AUTH ").length());
-    const QStringList parts = args.split(',');
+    if (cmd.args.size() != 2)
+        return "ERROR 400 AUTH requires username,password";
 
-    if (parts.size() == 2) {
-        username = parts[0].trimmed();
-        password = parts[1].trimmed();
-    }
-}
+    const QString& username = cmd.args[0];
+    const QString& password = cmd.args[1];
 
-QString AuthCommand::execute(ClientContext &context)
-{
-    const auto result = authService.authenticate(username, password);
-    QString errorCode ="";
+    AuthService::Result result =
+            context->authService->authenticate(username, password);
+
     switch (result) {
     case AuthService::Result::Success:
-        context.authenticated = true;
-        context.username = username;
-        errorCode = "OK 'Authenticated'\n";
-        break;
+        context->isAuthenticated = true;
+        return "OK Authenticated";
+
     case AuthService::Result::InvalidUsername:
-        errorCode = "ERROR 101 'Invalid Username'\n";
-        break;
+        return "ERROR 101 Invalid username";
+
     case AuthService::Result::InvalidPassword:
-        errorCode = "ERROR 102 'Invalid Password'\n";
-        break;
+        return "ERROR 102 Invalid password";
+
     default:
-        errorCode = "ERROR 500 'Internal Error'\n";
+        return "ERROR 500 Internal error";
     }
-    return errorCode;
 }

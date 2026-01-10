@@ -7,12 +7,8 @@
 class InfoCommand : public IServerCommand
 {
 public:
-    explicit InfoCommand(const QString& rawLine);
-    QString execute(ClientContext&) override;
-
-private:
-    QString filename;
-    FileService fileService;
+    QString execute(ClientContext* context, const ParsedCommand& cmd) override;
 };
+
 
 #endif // INFOCOMMAND_H

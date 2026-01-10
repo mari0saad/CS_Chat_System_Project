@@ -206,3 +206,99 @@ bool FileService::fileInfo(const QString &filename, qint64 &size, QDateTime &mod
     modified = info.lastModified();
     return true;
 }
+
+QString FileService::createFileCmd(const QString& filename)
+{
+    QString error;
+    if (createFile(filename, error))
+        return "OK file created successfully";
+
+    return "ERROR 500 " + error;
+}
+
+QString FileService::writeFileCmd(const QString& filename,
+                                  const QString& data)
+{
+    QString error;
+    if (writeFile(filename, data, error))
+        return "OK data written successfully";
+
+    return "ERROR 500 " + error;
+}
+
+QString FileService::appendFileCmd(const QString& filename,
+                                   const QString& data)
+{
+    QString error;
+    if (appendFile(filename, data, error))
+        return "OK data appended successfully";
+
+    return "ERROR 500 " + error;
+}
+
+QString FileService::readFileCmd(const QString& filename)
+{
+    QString data, error;
+    if (!readFile(filename, data, error))
+        return "ERROR 404 " + error;
+
+    return QString("OK %1\n%2")
+            .arg(data.toUtf8().size())
+            .arg(data);
+}
+
+
+QString FileService::deleteFileCmd(const QString& filename)
+{
+    QString error;
+    if (deleteFile(filename, error))
+        return "OK file deleted";
+
+    return "ERROR 404 " + error;
+}
+
+
+QString FileService::renameFileCmd(const QString& oldName,
+                                   const QString& newName)
+{
+    QString error;
+    if (renameFile(oldName, newName, error))
+        return "OK file renamed";
+
+    return "ERROR 500 " + error;
+}
+
+
+QString FileService::listFilesCmd()
+{
+    QStringList files;
+    QString error;
+
+    if (!listFiles(files, error))
+        return "ERROR 500 " + error;
+
+    QString response = QString("OK %1").arg(files.size());
+    for (const QString& f : files)
+        response += "\n" + f;
+
+    return response;
+}
+
+
+QString FileService::fileInfoCmd(const QString& filename)
+{
+    qint64 size;
+    QDateTime modified;
+    QString error;
+
+    if (!fileInfo(filename, size, modified, error))
+        return "ERROR 404 " + error;
+
+    return QString("OK size=%1 modified=%2")
+            .arg(size)
+            .arg(modified.toString(Qt::ISODate));
+}
+
+
+
+

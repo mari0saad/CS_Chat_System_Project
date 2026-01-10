@@ -39,35 +39,35 @@ namespace {
 struct qt_meta_stringdata_CLASSClientSessionENDCLASS_t {};
 static constexpr auto qt_meta_stringdata_CLASSClientSessionENDCLASS = QtMocHelpers::stringData(
     "ClientSession",
-    "finished",
-    "",
     "start",
-    "readData"
+    "",
+    "onReadyRead",
+    "onDisconnected"
 );
 #else  // !QT_MOC_HAS_STRING_DATA
 struct qt_meta_stringdata_CLASSClientSessionENDCLASS_t {
     uint offsetsAndSizes[10];
     char stringdata0[14];
-    char stringdata1[9];
+    char stringdata1[6];
     char stringdata2[1];
-    char stringdata3[6];
-    char stringdata4[9];
+    char stringdata3[12];
+    char stringdata4[15];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_CLASSClientSessionENDCLASS_t::offsetsAndSizes) + ofs), len 
 Q_CONSTINIT static const qt_meta_stringdata_CLASSClientSessionENDCLASS_t qt_meta_stringdata_CLASSClientSessionENDCLASS = {
     {
         QT_MOC_LITERAL(0, 13),  // "ClientSession"
-        QT_MOC_LITERAL(14, 8),  // "finished"
-        QT_MOC_LITERAL(23, 0),  // ""
-        QT_MOC_LITERAL(24, 5),  // "start"
-        QT_MOC_LITERAL(30, 8)   // "readData"
+        QT_MOC_LITERAL(14, 5),  // "start"
+        QT_MOC_LITERAL(20, 0),  // ""
+        QT_MOC_LITERAL(21, 11),  // "onReadyRead"
+        QT_MOC_LITERAL(33, 14)   // "onDisconnected"
     },
     "ClientSession",
-    "finished",
-    "",
     "start",
-    "readData"
+    "",
+    "onReadyRead",
+    "onDisconnected"
 };
 #undef QT_MOC_LITERAL
 #endif // !QT_MOC_HAS_STRING_DATA
@@ -84,19 +84,15 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSClientSessionENDCLASS[] = {
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       1,       // signalCount
-
- // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   32,    2, 0x06,    1 /* Public */,
+       0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       3,    0,   33,    2, 0x0a,    2 /* Public */,
+       1,    0,   32,    2, 0x0a,    1 /* Public */,
+       3,    0,   33,    2, 0x08,    2 /* Private */,
        4,    0,   34,    2, 0x08,    3 /* Private */,
 
- // signals: parameters
-    QMetaType::Void,
-
  // slots: parameters
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -112,11 +108,11 @@ Q_CONSTINIT const QMetaObject ClientSession::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSClientSessionENDCLASS_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<ClientSession, std::true_type>,
-        // method 'finished'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'start'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'readData'
+        // method 'onReadyRead'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'onDisconnected'
         QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
     nullptr
@@ -128,19 +124,10 @@ void ClientSession::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         auto *_t = static_cast<ClientSession *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->finished(); break;
-        case 1: _t->start(); break;
-        case 2: _t->readData(); break;
+        case 0: _t->start(); break;
+        case 1: _t->onReadyRead(); break;
+        case 2: _t->onDisconnected(); break;
         default: ;
-        }
-    } else if (_c == QMetaObject::IndexOfMethod) {
-        int *result = reinterpret_cast<int *>(_a[0]);
-        {
-            using _t = void (ClientSession::*)();
-            if (_t _q_method = &ClientSession::finished; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
-                *result = 0;
-                return;
-            }
         }
     }
     (void)_a;
@@ -174,11 +161,5 @@ int ClientSession::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         _id -= 3;
     }
     return _id;
-}
-
-// SIGNAL 0
-void ClientSession::finished()
-{
-    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
 }
 QT_WARNING_POP

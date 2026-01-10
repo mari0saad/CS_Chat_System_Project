@@ -7,12 +7,7 @@
 class RenameCommand : public IServerCommand
 {
 public:
-    explicit RenameCommand(const QString& rawLine);
-    QString execute(ClientContext&) override;
-
-private:
-    QString oldName;
-    QString newName;
-    FileService fileService;
+    QString execute(ClientContext* context, const ParsedCommand& cmd) override;
 };
+
 #endif // RENAMECOMMAND_H

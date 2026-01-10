@@ -8,12 +8,8 @@
 class WriteCommand : public IServerCommand
 {
 public:
-    WriteCommand(const QString& rawLine);
-    QString execute(ClientContext& context) override;
-private:
-    QString filename;
-    QString data;
-    FileService fileService;
+    QString execute(ClientContext* context, const ParsedCommand& cmd) override;
 };
+
 
 #endif // WRITECOMMAND_H

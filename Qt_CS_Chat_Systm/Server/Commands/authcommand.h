@@ -5,17 +5,9 @@
 #include "iservercommand.h"
 #include <QString>
 
-struct ClientContext;
-
-class AuthCommand : public IServerCommand
-{
+class AuthCommand : public IServerCommand {
 public:
-    explicit AuthCommand(const QString& rawLine);
-    QString execute(ClientContext& context) override;
-private:
-    QString username;
-    QString password;
-    AuthService authService;
+    QString execute(ClientContext* context, const ParsedCommand& cmd) override;
 };
 
 #endif // AUTHCOMMAND_H

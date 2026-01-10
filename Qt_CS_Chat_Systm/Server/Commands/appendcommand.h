@@ -7,13 +7,7 @@
 class AppendCommand : public IServerCommand
 {
 public:
-    explicit AppendCommand(const QString& rawLine);
-    QString execute(ClientContext& context) override;
-
-private:
-    QString filename;
-    QString data;
-    FileService fileService;
+    QString execute(ClientContext* context, const ParsedCommand& cmd) override;
 };
 
 #endif // APPENDCOMMAND_H

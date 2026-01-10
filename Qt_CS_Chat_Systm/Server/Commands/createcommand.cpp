@@ -1,17 +1,15 @@
 #include "createcommand.h"
 
+#define REQUIRE_AUTH(ctx) \
+    if (!(ctx)->isAuthenticated) return "ERROR 401 Unauthorized";
 
 
-CreateCommand::CreateCommand(const QString &rawLine)
+QString CreateCommand::execute(ClientContext *context, const ParsedCommand &cmd)
 {
-    filename = rawLine.mid(QString("CREATE ").length()).trimmed();
-}
+    REQUIRE_AUTH(context);
 
-QString CreateCommand::execute(ClientContext &context)
-{
-    QString errorMessage;
-    if (!fileService.createFile(filename, errorMessage)) {
-        return "ERROR 500 " + errorMessage + "\n";
-    }
-    return "OK file created successfully\n";
+    if (cmd.args.size() != 1)
+        return "ERROR 400 Missing filename";
+
+    return context->fileService->createFileCmd(cmd.args[0]);
 }

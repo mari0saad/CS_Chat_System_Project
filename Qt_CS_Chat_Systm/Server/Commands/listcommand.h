@@ -7,10 +7,8 @@
 class ListCommand : public IServerCommand
 {
 public:
-    QString execute(ClientContext&) override;
-
-private:
-    FileService fileService;
+    QString execute(ClientContext* context, const ParsedCommand& cmd) override;
 };
+
 
 #endif // LISTCOMMAND_H

@@ -1,16 +1,15 @@
 #include "deletecommand.h"
 
+#define REQUIRE_AUTH(ctx) \
+    if (!(ctx)->isAuthenticated) return "ERROR 401 Unauthorized";
 
-DeleteCommand::DeleteCommand(const QString& rawLine)
-{
-    filename = rawLine.mid(QString("DELETE ").length()).trimmed();
-}
 
-QString DeleteCommand::execute(ClientContext&)
+QString DeleteCommand::execute(ClientContext *context, const ParsedCommand &cmd)
 {
-    QString error;
-    if (!fileService.deleteFile(filename, error)) {
-        return "ERROR 404 " + error + "\n";
-    }
-    return "OK file deleted\n";
+    REQUIRE_AUTH(context);
+
+    if (cmd.args.size() != 1)
+        return "ERROR 400 Missing filename";
+
+    return context->fileService->deleteFileCmd(cmd.args[0]);
 }

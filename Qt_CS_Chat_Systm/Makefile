@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_NETWORK_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -fPIC -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++1z -Wall -Wextra -fPIC -D_REENTRANT $(DEFINES)
-INCPATH       = -I. -IClient -IServer -IServer/Core -IServer/Commands -IServer/Services -I../../../Qt6/include -I../../../Qt6/include/QtNetwork -I../../../Qt6/include/QtCore -I. -I../../../Qt6/mkspecs/linux-g++
+INCPATH       = -I. -IClient -IServer -IServer/Core -IServer/Commands -IServer/Services -IServer/Parsers -I../../../Qt6/include -I../../../Qt6/include/QtNetwork -I../../../Qt6/include/QtCore -I. -I../../../Qt6/mkspecs/linux-g++
 QMAKE         = /home/ms/Qt6/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -62,7 +62,8 @@ SOURCES       = Client/client.cpp \
 		Server/Commands/readcommand.cpp \
 		Server/Commands/renamecommand.cpp \
 		Server/Commands/writecommand.cpp \
-		Server/Core/commanddispatcher.cpp \
+		Server/Parsers/jsoncommandparser.cpp \
+		Server/Parsers/textcommandparser.cpp \
 		Server/Services/authservice.cpp \
 		Server/Services/fileservice.cpp \
 		Server/clientsession.cpp \
@@ -80,7 +81,8 @@ OBJECTS       = client.o \
 		readcommand.o \
 		renamecommand.o \
 		writecommand.o \
-		commanddispatcher.o \
+		jsoncommandparser.o \
+		textcommandparser.o \
 		authservice.o \
 		fileservice.o \
 		clientsession.o \
@@ -335,17 +337,21 @@ DIST          = ../../../Qt6/mkspecs/features/spec_pre.prf \
 		Qt_CS_Chat_Systm.pro Client/client.h \
 		Server/Commands/appendcommand.h \
 		Server/Commands/authcommand.h \
+		Server/Commands/commandregistry.h \
 		Server/Commands/createcommand.h \
 		Server/Commands/deletecommand.h \
 		Server/Commands/infocommand.h \
 		Server/Commands/listcommand.h \
+		Server/Commands/parsedcommand.h \
 		Server/Commands/readcommand.h \
 		Server/Commands/renamecommand.h \
 		Server/Commands/writecommand.h \
 		Server/Core/clientcontext.h \
-		Server/Core/commanddispatcher.h \
 		Server/Core/iservercommand.h \
 		Server/Core/serverconfig.h \
+		Server/Parsers/icommandparser.h \
+		Server/Parsers/jsoncommandparser.h \
+		Server/Parsers/textcommandparser.h \
 		Server/Services/authservice.h \
 		Server/Services/fileservice.h \
 		Server/clientsession.h \
@@ -359,7 +365,8 @@ DIST          = ../../../Qt6/mkspecs/features/spec_pre.prf \
 		Server/Commands/readcommand.cpp \
 		Server/Commands/renamecommand.cpp \
 		Server/Commands/writecommand.cpp \
-		Server/Core/commanddispatcher.cpp \
+		Server/Parsers/jsoncommandparser.cpp \
+		Server/Parsers/textcommandparser.cpp \
 		Server/Services/authservice.cpp \
 		Server/Services/fileservice.cpp \
 		Server/clientsession.cpp \
@@ -884,8 +891,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../Qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Client/client.h Server/Commands/appendcommand.h Server/Commands/authcommand.h Server/Commands/createcommand.h Server/Commands/deletecommand.h Server/Commands/infocommand.h Server/Commands/listcommand.h Server/Commands/readcommand.h Server/Commands/renamecommand.h Server/Commands/writecommand.h Server/Core/clientcontext.h Server/Core/commanddispatcher.h Server/Core/iservercommand.h Server/Core/serverconfig.h Server/Services/authservice.h Server/Services/fileservice.h Server/clientsession.h Server/server.h $(DISTDIR)/
-	$(COPY_FILE) --parents Client/client.cpp Server/Commands/appendcommand.cpp Server/Commands/authcommand.cpp Server/Commands/createcommand.cpp Server/Commands/deletecommand.cpp Server/Commands/infocommand.cpp Server/Commands/listcommand.cpp Server/Commands/readcommand.cpp Server/Commands/renamecommand.cpp Server/Commands/writecommand.cpp Server/Core/commanddispatcher.cpp Server/Services/authservice.cpp Server/Services/fileservice.cpp Server/clientsession.cpp Server/server.cpp main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents Client/client.h Server/Commands/appendcommand.h Server/Commands/authcommand.h Server/Commands/commandregistry.h Server/Commands/createcommand.h Server/Commands/deletecommand.h Server/Commands/infocommand.h Server/Commands/listcommand.h Server/Commands/parsedcommand.h Server/Commands/readcommand.h Server/Commands/renamecommand.h Server/Commands/writecommand.h Server/Core/clientcontext.h Server/Core/iservercommand.h Server/Core/serverconfig.h Server/Parsers/icommandparser.h Server/Parsers/jsoncommandparser.h Server/Parsers/textcommandparser.h Server/Services/authservice.h Server/Services/fileservice.h Server/clientsession.h Server/server.h $(DISTDIR)/
+	$(COPY_FILE) --parents Client/client.cpp Server/Commands/appendcommand.cpp Server/Commands/authcommand.cpp Server/Commands/createcommand.cpp Server/Commands/deletecommand.cpp Server/Commands/infocommand.cpp Server/Commands/listcommand.cpp Server/Commands/readcommand.cpp Server/Commands/renamecommand.cpp Server/Commands/writecommand.cpp Server/Parsers/jsoncommandparser.cpp Server/Parsers/textcommandparser.cpp Server/Services/authservice.cpp Server/Services/fileservice.cpp Server/clientsession.cpp Server/server.cpp main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1036,7 +1043,7 @@ moc_client.cpp: Client/client.h \
 		../../../Qt6/include/QtCore/qvariant.h \
 		moc_predefs.h \
 		../../../Qt6/libexec/moc
-	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Core -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Commands -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Services -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include Client/client.h -o moc_client.cpp
+	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Core -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Commands -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Services -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Parsers -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include Client/client.h -o moc_client.cpp
 
 moc_clientsession.cpp: Server/clientsession.h \
 		../../../Qt6/include/QtCore/QObject \
@@ -1155,9 +1162,26 @@ moc_clientsession.cpp: Server/clientsession.h \
 		Server/Core/commanddispatcher.h \
 		../../../Qt6/include/QtCore/QString \
 		Server/Core/clientcontext.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		Server/Services/authservice.h \
+		Server/Commands/commandregistry.h \
+		Server/Core/iservercommand.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList \
+		../../../Qt6/include/QtCore/QMap \
+		Server/Parsers/textcommandparser.h \
+		Server/Parsers/icommandparser.h \
+		Server/Parsers/jsoncommandparser.h \
 		moc_predefs.h \
 		../../../Qt6/libexec/moc
-	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Core -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Commands -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Services -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include Server/clientsession.h -o moc_clientsession.cpp
+	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Core -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Commands -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Services -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Parsers -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include Server/clientsession.h -o moc_clientsession.cpp
 
 moc_server.cpp: Server/server.h \
 		../../../Qt6/include/QtCore/QObject \
@@ -1272,9 +1296,26 @@ moc_server.cpp: Server/server.h \
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
 		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Commands/commandregistry.h \
+		Server/Core/iservercommand.h \
+		../../../Qt6/include/QtCore/QString \
+		Server/Core/clientcontext.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList \
+		../../../Qt6/include/QtCore/QMap \
 		moc_predefs.h \
 		../../../Qt6/libexec/moc
-	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Core -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Commands -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Services -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include Server/server.h -o moc_server.cpp
+	/home/ms/Qt6/libexec/moc $(DEFINES) --include /home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/moc_predefs.h -I/home/ms/Qt6/mkspecs/linux-g++ -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Client -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Core -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Commands -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Services -I/home/ms/Workshop/CS_Chat_System_Project/Qt_CS_Chat_Systm/Server/Parsers -I/home/ms/Qt6/include -I/home/ms/Qt6/include/QtNetwork -I/home/ms/Qt6/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include Server/server.h -o moc_server.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1522,7 +1563,11 @@ appendcommand.o: Server/Commands/appendcommand.cpp Server/Commands/appendcommand
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
 		../../../Qt6/include/QtCore/q20memory.h \
-		Server/Core/iservercommand.h
+		Server/Core/iservercommand.h \
+		Server/Core/clientcontext.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o appendcommand.o Server/Commands/appendcommand.cpp
 
 authcommand.o: Server/Commands/authcommand.cpp Server/Commands/authcommand.h \
@@ -1595,14 +1640,56 @@ authcommand.o: Server/Commands/authcommand.cpp Server/Commands/authcommand.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
 		Server/Core/iservercommand.h \
 		Server/Core/clientcontext.h \
-		../../../Qt6/include/QtCore/QStringList \
-		../../../Qt6/include/QtCore/qstringlist.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qiodevice.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
 		../../../Qt6/include/QtCore/qlist.h \
 		../../../Qt6/include/QtCore/qhashfunctions.h \
 		../../../Qt6/include/QtCore/qiterator.h \
 		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qstringlist.h \
 		../../../Qt6/include/QtCore/qalgorithms.h \
-		../../../Qt6/include/QtCore/qstringmatcher.h
+		../../../Qt6/include/QtCore/qstringmatcher.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qmetatype.h \
+		../../../Qt6/include/QtCore/qcompare.h \
+		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qfloat16.h \
+		../../../Qt6/include/QtCore/qmath.h \
+		../../../Qt6/include/QtCore/qiterable.h \
+		../../../Qt6/include/QtCore/qmetacontainer.h \
+		../../../Qt6/include/QtCore/qcontainerinfo.h \
+		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qscopeguard.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		../../../Qt6/include/QtCore/qdebug.h \
+		../../../Qt6/include/QtCore/qtextstream.h \
+		../../../Qt6/include/QtCore/qstringconverter_base.h \
+		../../../Qt6/include/QtCore/qcontiguouscache.h \
+		../../../Qt6/include/QtCore/qsharedpointer.h \
+		../../../Qt6/include/QtCore/qsharedpointer_impl.h \
+		../../../Qt6/include/QtCore/qmap.h \
+		../../../Qt6/include/QtCore/qshareddata_impl.h \
+		../../../Qt6/include/QtCore/qset.h \
+		../../../Qt6/include/QtCore/qhash.h \
+		../../../Qt6/include/QtCore/qvarlengtharray.h \
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o authcommand.o Server/Commands/authcommand.cpp
 
 createcommand.o: Server/Commands/createcommand.cpp Server/Commands/createcommand.h \
@@ -1673,6 +1760,7 @@ createcommand.o: Server/Commands/createcommand.cpp Server/Commands/createcommand
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Core/clientcontext.h \
 		Server/Services/fileservice.h \
 		../../../Qt6/include/QtCore/QFileInfo \
 		../../../Qt6/include/QtCore/qfileinfo.h \
@@ -1720,7 +1808,10 @@ createcommand.o: Server/Commands/createcommand.cpp Server/Commands/createcommand
 		../../../Qt6/include/QtCore/qset.h \
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
-		../../../Qt6/include/QtCore/q20memory.h
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o createcommand.o Server/Commands/createcommand.cpp
 
 deletecommand.o: Server/Commands/deletecommand.cpp Server/Commands/deletecommand.h \
@@ -1791,6 +1882,7 @@ deletecommand.o: Server/Commands/deletecommand.cpp Server/Commands/deletecommand
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Core/clientcontext.h \
 		Server/Services/fileservice.h \
 		../../../Qt6/include/QtCore/QFileInfo \
 		../../../Qt6/include/QtCore/qfileinfo.h \
@@ -1838,7 +1930,10 @@ deletecommand.o: Server/Commands/deletecommand.cpp Server/Commands/deletecommand
 		../../../Qt6/include/QtCore/qset.h \
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
-		../../../Qt6/include/QtCore/q20memory.h
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o deletecommand.o Server/Commands/deletecommand.cpp
 
 infocommand.o: Server/Commands/infocommand.cpp Server/Commands/infocommand.h \
@@ -1909,6 +2004,7 @@ infocommand.o: Server/Commands/infocommand.cpp Server/Commands/infocommand.h \
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Core/clientcontext.h \
 		Server/Services/fileservice.h \
 		../../../Qt6/include/QtCore/QFileInfo \
 		../../../Qt6/include/QtCore/qfileinfo.h \
@@ -1956,7 +2052,10 @@ infocommand.o: Server/Commands/infocommand.cpp Server/Commands/infocommand.h \
 		../../../Qt6/include/QtCore/qset.h \
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
-		../../../Qt6/include/QtCore/q20memory.h
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o infocommand.o Server/Commands/infocommand.cpp
 
 listcommand.o: Server/Commands/listcommand.cpp Server/Commands/listcommand.h \
@@ -2027,6 +2126,7 @@ listcommand.o: Server/Commands/listcommand.cpp Server/Commands/listcommand.h \
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Core/clientcontext.h \
 		Server/Services/fileservice.h \
 		../../../Qt6/include/QtCore/QFileInfo \
 		../../../Qt6/include/QtCore/qfileinfo.h \
@@ -2074,7 +2174,10 @@ listcommand.o: Server/Commands/listcommand.cpp Server/Commands/listcommand.h \
 		../../../Qt6/include/QtCore/qset.h \
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
-		../../../Qt6/include/QtCore/q20memory.h
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o listcommand.o Server/Commands/listcommand.cpp
 
 readcommand.o: Server/Commands/readcommand.cpp Server/Commands/readcommand.h \
@@ -2145,6 +2248,7 @@ readcommand.o: Server/Commands/readcommand.cpp Server/Commands/readcommand.h \
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Core/clientcontext.h \
 		Server/Services/fileservice.h \
 		../../../Qt6/include/QtCore/QFileInfo \
 		../../../Qt6/include/QtCore/qfileinfo.h \
@@ -2192,7 +2296,10 @@ readcommand.o: Server/Commands/readcommand.cpp Server/Commands/readcommand.h \
 		../../../Qt6/include/QtCore/qset.h \
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
-		../../../Qt6/include/QtCore/q20memory.h
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o readcommand.o Server/Commands/readcommand.cpp
 
 renamecommand.o: Server/Commands/renamecommand.cpp Server/Commands/renamecommand.h \
@@ -2263,6 +2370,7 @@ renamecommand.o: Server/Commands/renamecommand.cpp Server/Commands/renamecommand
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Core/clientcontext.h \
 		Server/Services/fileservice.h \
 		../../../Qt6/include/QtCore/QFileInfo \
 		../../../Qt6/include/QtCore/qfileinfo.h \
@@ -2310,7 +2418,10 @@ renamecommand.o: Server/Commands/renamecommand.cpp Server/Commands/renamecommand
 		../../../Qt6/include/QtCore/qset.h \
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
-		../../../Qt6/include/QtCore/q20memory.h
+		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o renamecommand.o Server/Commands/renamecommand.cpp
 
 writecommand.o: Server/Commands/writecommand.cpp Server/Commands/writecommand.h \
@@ -2381,6 +2492,7 @@ writecommand.o: Server/Commands/writecommand.cpp Server/Commands/writecommand.h 
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
+		Server/Core/clientcontext.h \
 		Server/Services/fileservice.h \
 		../../../Qt6/include/QtCore/QFileInfo \
 		../../../Qt6/include/QtCore/qfileinfo.h \
@@ -2429,10 +2541,14 @@ writecommand.o: Server/Commands/writecommand.cpp Server/Commands/writecommand.h 
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
 		../../../Qt6/include/QtCore/q20memory.h \
-		Server/Core/clientcontext.h
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o writecommand.o Server/Commands/writecommand.cpp
 
-commanddispatcher.o: Server/Core/commanddispatcher.cpp Server/Core/commanddispatcher.h \
+jsoncommandparser.o: Server/Parsers/jsoncommandparser.cpp Server/Parsers/jsoncommandparser.h \
+		Server/Parsers/icommandparser.h \
+		Server/Commands/parsedcommand.h \
 		../../../Qt6/include/QtCore/QString \
 		../../../Qt6/include/QtCore/qstring.h \
 		../../../Qt6/include/QtCore/qchar.h \
@@ -2499,47 +2615,37 @@ commanddispatcher.o: Server/Core/commanddispatcher.cpp Server/Core/commanddispat
 		../../../Qt6/include/QtCore/qutf8stringview.h \
 		../../../Qt6/include/QtCore/qstringtokenizer.h \
 		../../../Qt6/include/QtCore/qstringbuilder.h \
-		Server/Core/iservercommand.h \
-		Server/Commands/authcommand.h \
-		Server/Services/authservice.h \
-		Server/Core/clientcontext.h \
-		Server/Commands/createcommand.h \
-		Server/Services/fileservice.h \
-		../../../Qt6/include/QtCore/QFileInfo \
-		../../../Qt6/include/QtCore/qfileinfo.h \
-		../../../Qt6/include/QtCore/qfile.h \
-		../../../Qt6/include/QtCore/qfiledevice.h \
-		../../../Qt6/include/QtCore/qiodevice.h \
-		../../../Qt6/include/QtCore/qiodevicebase.h \
-		../../../Qt6/include/QtCore/qobject.h \
-		../../../Qt6/include/QtCore/qobjectdefs.h \
-		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
+		../../../Qt6/include/QtCore/QStringList \
+		../../../Qt6/include/QtCore/qstringlist.h \
 		../../../Qt6/include/QtCore/qlist.h \
 		../../../Qt6/include/QtCore/qhashfunctions.h \
 		../../../Qt6/include/QtCore/qiterator.h \
 		../../../Qt6/include/QtCore/qbytearraylist.h \
-		../../../Qt6/include/QtCore/qstringlist.h \
 		../../../Qt6/include/QtCore/qalgorithms.h \
 		../../../Qt6/include/QtCore/qstringmatcher.h \
-		../../../Qt6/include/QtCore/qcoreevent.h \
-		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/QJsonDocument \
+		../../../Qt6/include/QtCore/qjsondocument.h \
+		../../../Qt6/include/QtCore/qjsonvalue.h \
+		../../../Qt6/include/QtCore/qshareddata.h \
+		../../../Qt6/include/QtCore/qcborvalue.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
 		../../../Qt6/include/QtCore/qmetatype.h \
 		../../../Qt6/include/QtCore/qcompare.h \
 		../../../Qt6/include/QtCore/qdatastream.h \
+		../../../Qt6/include/QtCore/qscopedpointer.h \
+		../../../Qt6/include/QtCore/qiodevicebase.h \
 		../../../Qt6/include/QtCore/qfloat16.h \
 		../../../Qt6/include/QtCore/qmath.h \
 		../../../Qt6/include/QtCore/qiterable.h \
 		../../../Qt6/include/QtCore/qmetacontainer.h \
 		../../../Qt6/include/QtCore/qcontainerinfo.h \
 		../../../Qt6/include/QtCore/qtaggedpointer.h \
+		../../../Qt6/include/QtCore/qobjectdefs.h \
+		../../../Qt6/include/QtCore/qobjectdefs_impl.h \
 		../../../Qt6/include/QtCore/qscopeguard.h \
-		../../../Qt6/include/QtCore/qobject_impl.h \
-		../../../Qt6/include/QtCore/qbindingstorage.h \
-		../../../Qt6/include/QtCore/qshareddata.h \
-		../../../Qt6/include/QtCore/qdatetime.h \
-		../../../Qt6/include/QtCore/qcalendar.h \
-		../../../Qt6/include/QtCore/qlocale.h \
-		../../../Qt6/include/QtCore/qvariant.h \
 		../../../Qt6/include/QtCore/qdebug.h \
 		../../../Qt6/include/QtCore/qtextstream.h \
 		../../../Qt6/include/QtCore/qstringconverter_base.h \
@@ -2552,14 +2658,96 @@ commanddispatcher.o: Server/Core/commanddispatcher.cpp Server/Core/commanddispat
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
 		../../../Qt6/include/QtCore/q20memory.h \
-		Server/Commands/writecommand.h \
-		Server/Commands/appendcommand.h \
-		Server/Commands/readcommand.h \
-		Server/Commands/renamecommand.h \
-		Server/Commands/listcommand.h \
-		Server/Commands/deletecommand.h \
-		Server/Commands/infocommand.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commanddispatcher.o Server/Core/commanddispatcher.cpp
+		../../../Qt6/include/QtCore/qobject.h \
+		../../../Qt6/include/QtCore/qcoreevent.h \
+		../../../Qt6/include/QtCore/qobject_impl.h \
+		../../../Qt6/include/QtCore/qbindingstorage.h \
+		../../../Qt6/include/QtCore/qcborcommon.h \
+		../../../Qt6/include/QtCore/qregularexpression.h \
+		../../../Qt6/include/QtCore/qurl.h \
+		../../../Qt6/include/QtCore/quuid.h \
+		../../../Qt6/include/QtCore/QJsonObject \
+		../../../Qt6/include/QtCore/qjsonobject.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o jsoncommandparser.o Server/Parsers/jsoncommandparser.cpp
+
+textcommandparser.o: Server/Parsers/textcommandparser.cpp Server/Parsers/textcommandparser.h \
+		Server/Parsers/icommandparser.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QString \
+		../../../Qt6/include/QtCore/qstring.h \
+		../../../Qt6/include/QtCore/qchar.h \
+		../../../Qt6/include/QtCore/qglobal.h \
+		../../../Qt6/include/QtCore/qtversionchecks.h \
+		../../../Qt6/include/QtCore/qconfig.h \
+		../../../Qt6/include/QtCore/qtcore-config.h \
+		../../../Qt6/include/QtCore/qtconfigmacros.h \
+		../../../Qt6/include/QtCore/qtcoreexports.h \
+		../../../Qt6/include/QtCore/qtpreprocessorsupport.h \
+		../../../Qt6/include/QtCore/qtnoop.h \
+		../../../Qt6/include/QtCore/qsystemdetection.h \
+		../../../Qt6/include/QtCore/qprocessordetection.h \
+		../../../Qt6/include/QtCore/qcompilerdetection.h \
+		../../../Qt6/include/QtCore/qassert.h \
+		../../../Qt6/include/QtCore/qtypes.h \
+		../../../Qt6/include/QtCore/qtclasshelpermacros.h \
+		../../../Qt6/include/QtCore/qtversion.h \
+		../../../Qt6/include/QtCore/qtypeinfo.h \
+		../../../Qt6/include/QtCore/qcontainerfwd.h \
+		../../../Qt6/include/QtCore/qsysinfo.h \
+		../../../Qt6/include/QtCore/qlogging.h \
+		../../../Qt6/include/QtCore/qflags.h \
+		../../../Qt6/include/QtCore/qcompare_impl.h \
+		../../../Qt6/include/QtCore/qatomic.h \
+		../../../Qt6/include/QtCore/qbasicatomic.h \
+		../../../Qt6/include/QtCore/qatomic_cxx11.h \
+		../../../Qt6/include/QtCore/qgenericatomic.h \
+		../../../Qt6/include/QtCore/qconstructormacros.h \
+		../../../Qt6/include/QtCore/qdarwinhelpers.h \
+		../../../Qt6/include/QtCore/qexceptionhandling.h \
+		../../../Qt6/include/QtCore/qforeach.h \
+		../../../Qt6/include/QtCore/qtdeprecationmarkers.h \
+		../../../Qt6/include/QtCore/qttypetraits.h \
+		../../../Qt6/include/QtCore/qfunctionpointer.h \
+		../../../Qt6/include/QtCore/qglobalstatic.h \
+		../../../Qt6/include/QtCore/qmalloc.h \
+		../../../Qt6/include/QtCore/qminmax.h \
+		../../../Qt6/include/QtCore/qnumeric.h \
+		../../../Qt6/include/QtCore/qoverload.h \
+		../../../Qt6/include/QtCore/qswap.h \
+		../../../Qt6/include/QtCore/qtenvironmentvariables.h \
+		../../../Qt6/include/QtCore/qtresource.h \
+		../../../Qt6/include/QtCore/qttranslation.h \
+		../../../Qt6/include/QtCore/qversiontagging.h \
+		../../../Qt6/include/QtCore/qstringview.h \
+		../../../Qt6/include/QtCore/qbytearray.h \
+		../../../Qt6/include/QtCore/qrefcount.h \
+		../../../Qt6/include/QtCore/qnamespace.h \
+		../../../Qt6/include/QtCore/qtmetamacros.h \
+		../../../Qt6/include/QtCore/qarraydata.h \
+		../../../Qt6/include/QtCore/qpair.h \
+		../../../Qt6/include/QtCore/qarraydatapointer.h \
+		../../../Qt6/include/QtCore/qarraydataops.h \
+		../../../Qt6/include/QtCore/qcontainertools_impl.h \
+		../../../Qt6/include/QtCore/qxptype_traits.h \
+		../../../Qt6/include/QtCore/qbytearrayalgorithms.h \
+		../../../Qt6/include/QtCore/qbytearrayview.h \
+		../../../Qt6/include/QtCore/qstringfwd.h \
+		../../../Qt6/include/QtCore/q20type_traits.h \
+		../../../Qt6/include/QtCore/qstringliteral.h \
+		../../../Qt6/include/QtCore/qstringalgorithms.h \
+		../../../Qt6/include/QtCore/qanystringview.h \
+		../../../Qt6/include/QtCore/qutf8stringview.h \
+		../../../Qt6/include/QtCore/qstringtokenizer.h \
+		../../../Qt6/include/QtCore/qstringbuilder.h \
+		../../../Qt6/include/QtCore/QStringList \
+		../../../Qt6/include/QtCore/qstringlist.h \
+		../../../Qt6/include/QtCore/qlist.h \
+		../../../Qt6/include/QtCore/qhashfunctions.h \
+		../../../Qt6/include/QtCore/qiterator.h \
+		../../../Qt6/include/QtCore/qbytearraylist.h \
+		../../../Qt6/include/QtCore/qalgorithms.h \
+		../../../Qt6/include/QtCore/qstringmatcher.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o textcommandparser.o Server/Parsers/textcommandparser.cpp
 
 authservice.o: Server/Services/authservice.cpp Server/Services/authservice.h \
 		../../../Qt6/include/QtCore/QString \
@@ -2868,6 +3056,23 @@ clientsession.o: Server/clientsession.cpp Server/clientsession.h \
 		Server/Core/commanddispatcher.h \
 		../../../Qt6/include/QtCore/QString \
 		Server/Core/clientcontext.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		Server/Services/authservice.h \
+		Server/Commands/commandregistry.h \
+		Server/Core/iservercommand.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList \
+		../../../Qt6/include/QtCore/QMap \
+		Server/Parsers/textcommandparser.h \
+		Server/Parsers/icommandparser.h \
+		Server/Parsers/jsoncommandparser.h \
 		../../../Qt6/include/QtCore/QDebug \
 		../../../Qt6/include/QtCore/QThread \
 		../../../Qt6/include/QtCore/qthread.h \
@@ -2988,14 +3193,31 @@ server.o: Server/server.cpp Server/server.h \
 		../../../Qt6/include/QtCore/qhash.h \
 		../../../Qt6/include/QtCore/qvarlengtharray.h \
 		../../../Qt6/include/QtCore/q20memory.h \
+		Server/Commands/commandregistry.h \
+		Server/Core/iservercommand.h \
+		../../../Qt6/include/QtCore/QString \
+		Server/Core/clientcontext.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		../../../Qt6/include/QtCore/qvariant.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QStringList \
+		../../../Qt6/include/QtCore/QMap \
 		../../../Qt6/include/QtCore/QDebug \
 		Server/clientsession.h \
 		../../../Qt6/include/QtNetwork/QTcpSocket \
 		../../../Qt6/include/QtNetwork/qtcpsocket.h \
-		../../../Qt6/include/QtCore/qvariant.h \
 		Server/Core/commanddispatcher.h \
-		../../../Qt6/include/QtCore/QString \
-		Server/Core/clientcontext.h \
+		Server/Parsers/textcommandparser.h \
+		Server/Parsers/icommandparser.h \
+		Server/Parsers/jsoncommandparser.h \
 		../../../Qt6/include/QtCore/QThread \
 		../../../Qt6/include/QtCore/qthread.h \
 		../../../Qt6/include/QtCore/qdeadlinetimer.h \
@@ -3003,12 +3225,15 @@ server.o: Server/server.cpp Server/server.h \
 		Server/Core/serverconfig.h \
 		../../../Qt6/include/QtCore/QDir \
 		../../../Qt6/include/QtCore/qdir.h \
-		../../../Qt6/include/QtCore/qfile.h \
-		../../../Qt6/include/QtCore/qfiledevice.h \
-		../../../Qt6/include/QtCore/qfileinfo.h \
-		../../../Qt6/include/QtCore/qdatetime.h \
-		../../../Qt6/include/QtCore/qcalendar.h \
-		../../../Qt6/include/QtCore/qlocale.h
+		Server/Commands/authcommand.h \
+		Server/Commands/createcommand.h \
+		Server/Commands/readcommand.h \
+		Server/Commands/writecommand.h \
+		Server/Commands/appendcommand.h \
+		Server/Commands/deletecommand.h \
+		Server/Commands/listcommand.h \
+		Server/Commands/renamecommand.h \
+		Server/Commands/infocommand.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o server.o Server/server.cpp
 
 main.o: main.cpp ../../../Qt6/include/QtCore/QCoreApplication \
@@ -3149,6 +3374,21 @@ main.o: main.cpp ../../../Qt6/include/QtCore/QCoreApplication \
 		../../../Qt6/include/QtNetwork/qabstractsocket.h \
 		../../../Qt6/include/QtNetwork/qhostaddress.h \
 		../../../Qt6/include/QtCore/qiodevice.h \
+		Server/Commands/commandregistry.h \
+		Server/Core/iservercommand.h \
+		../../../Qt6/include/QtCore/QString \
+		Server/Core/clientcontext.h \
+		Server/Services/fileservice.h \
+		../../../Qt6/include/QtCore/QFileInfo \
+		../../../Qt6/include/QtCore/qfileinfo.h \
+		../../../Qt6/include/QtCore/qfile.h \
+		../../../Qt6/include/QtCore/qfiledevice.h \
+		../../../Qt6/include/QtCore/qdatetime.h \
+		../../../Qt6/include/QtCore/qcalendar.h \
+		../../../Qt6/include/QtCore/qlocale.h \
+		Server/Services/authservice.h \
+		Server/Commands/parsedcommand.h \
+		../../../Qt6/include/QtCore/QMap \
 		Client/client.h \
 		../../../Qt6/include/QtNetwork/QTcpSocket \
 		../../../Qt6/include/QtNetwork/qtcpsocket.h

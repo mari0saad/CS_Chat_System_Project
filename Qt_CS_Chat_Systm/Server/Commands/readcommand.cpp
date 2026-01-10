@@ -1,21 +1,15 @@
 #include "readcommand.h"
 
 
-ReadCommand::ReadCommand(const QString &rawLine)
-{
-    filename = rawLine.mid(QString("READ ").length()).trimmed();
-}
+#define REQUIRE_AUTH(ctx) \
+    if (!(ctx)->isAuthenticated) return "ERROR 401 Unauthorized";
 
-QString ReadCommand::execute(ClientContext &context)
+QString ReadCommand::execute(ClientContext *context, const ParsedCommand &cmd)
 {
-    QString fileContent;
-    QString errorMessage;
-    if (!fileService.readFile(filename, fileContent, errorMessage)) {
-        return "ERROR 404 " + errorMessage + "\n";
-    }
-    QByteArray data = fileContent.toUtf8();
-    QString response;
-    response += "OK " + QString::number(data.size()) + "\n";
-    response += fileContent + "\n";
-    return response;
+    REQUIRE_AUTH(context);
+
+    if (cmd.args.size() != 1)
+        return "ERROR 400 Missing filename";
+
+    return context->fileService->readFileCmd(cmd.args[0]);
 }

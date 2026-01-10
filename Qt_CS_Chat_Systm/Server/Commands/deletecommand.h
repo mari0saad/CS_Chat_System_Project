@@ -7,12 +7,8 @@
 class DeleteCommand : public IServerCommand
 {
 public:
-    explicit DeleteCommand(const QString& rawLine);
-    QString execute(ClientContext&) override;
-
-private:
-    QString filename;
-    FileService fileService;
+    QString execute(ClientContext* context, const ParsedCommand& cmd) override;
 };
+
 
 #endif // DELETECOMMAND_H

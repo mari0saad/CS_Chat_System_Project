@@ -1,23 +1,14 @@
 #include "writecommand.h"
 #include "clientcontext.h"
 
-WriteCommand::WriteCommand(const QString &rawLine)
+#define REQUIRE_AUTH(ctx) \
+    if (!(ctx)->isAuthenticated) return "ERROR 401 Unauthorized";
+
+
+QString WriteCommand::execute(ClientContext *context, const ParsedCommand &cmd)
 {
-    int delimeter = rawLine.indexOf(';');
-    if(delimeter != -1)
-    {
-        filename = rawLine.mid(QString("WRITE ").length(), delimeter - QString("WRITE ").length()).trimmed();
-        data = rawLine.mid(delimeter +1 );
-    }
+    REQUIRE_AUTH(context);
+    if (cmd.args.size() != 1)
+        return "ERROR 400 Missing filename";
+    return context->fileService->writeFileCmd(cmd.args[0], cmd.data);
 }
-
-QString WriteCommand::execute(ClientContext &context)
-{
-    QString errorMessage;
-    if (!fileService.writeFile(filename, data, errorMessage)) {
-        return "ERROR 500 " + errorMessage + "\n";
-    }
-    return "OK data written successfully\n";
-}
-
-

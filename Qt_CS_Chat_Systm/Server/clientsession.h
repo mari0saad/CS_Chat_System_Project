@@ -5,28 +5,34 @@
 #include <QTcpSocket>
 #include "commanddispatcher.h"
 #include "clientcontext.h"
+#include "commandregistry.h"
+#include "textcommandparser.h"
+#include "jsoncommandparser.h"
 
 class ClientSession : public QObject
 {
     Q_OBJECT
 public:
-    explicit ClientSession(qintptr socketDescriptor, QObject* parent = nullptr);
+    explicit ClientSession(qintptr socketDescriptor, CommandRegistry* registry, QObject* parent = nullptr);
 public slots:
     void start();
 
-signals:
-    void finished();
-
 private slots:
-    void readData();
+    void onReadyRead();
+    void onDisconnected();
 
 private:
-    QTcpSocket* socket = nullptr;
-    qintptr socketDescriptor;
-    ClientContext context;
-    CommandDispatcher dispatcher;
-    QByteArray buffer;
+    QTcpSocket* m_socket = nullptr;
 
+    // Parsing
+    TextCommandParser m_textParser;
+    JsonCommandParser m_jsonParser;
+
+    // Dispatch
+    CommandRegistry* m_registry = nullptr;
+
+    // Per-client state
+    ClientContext m_context;
 };
 
 

@@ -7,6 +7,16 @@
 class FileService
 {
 public:
+    QString createFileCmd(const QString& filename);
+    QString writeFileCmd(const QString& filename, const QString& data);
+    QString appendFileCmd(const QString& filename, const QString& data);
+    QString readFileCmd(const QString& filename);
+    QString deleteFileCmd(const QString& filename);
+    QString renameFileCmd(const QString& oldName, const QString& newName);
+    QString listFilesCmd();
+    QString fileInfoCmd(const QString& filename);
+
+private:
     bool createFile(const QString &filename, QString &errorMessage);
     bool writeFile(const QString &filename, const QString &data, QString &errorMessage);
     bool appendFile(const QString &filename, const QString &data, QString &errorMessage);
@@ -16,7 +26,6 @@ public:
     bool listFiles(QStringList &files, QString &errorMessage);
     bool fileInfo(const QString &filename, qint64 &size, QDateTime &modified, QString &errorMessage);
 
-private:
     bool isValidFilename(const QString& filename) const;
     bool resolvePath(const QString &clientFilename, QString &resolvedPath, QString &errorMessage) const;
 };
